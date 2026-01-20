@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import { useNavigate } from 'react-router-dom';
 import Auth from './Auth';
 import AdminPanel from './AdminPanel';
 
@@ -24,6 +25,7 @@ interface Message {
 }
 
 const Index = () => {
+  const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [activeSection, setActiveSection] = useState('chats');
   const [activeChat, setActiveChat] = useState<number | null>(null);
@@ -51,13 +53,23 @@ const Index = () => {
     return <Auth onAuthSuccess={setUser} />;
   }
 
-  const chats: Chat[] = [
-    { id: 1, name: 'Анна Смирнова', lastMessage: 'Отлично, созвонимся завтра!', time: '14:32', unread: 3, avatar: 'АС', online: true },
-    { id: 2, name: 'Команда Проекта', lastMessage: 'Новые задачи добавлены', time: '12:15', unread: 1, avatar: 'КП', online: false },
-    { id: 3, name: 'Максим Петров', lastMessage: 'Спасибо за помощь 👍', time: 'Вчера', unread: 0, avatar: 'МП', online: true },
-    { id: 4, name: 'Ольга Иванова', lastMessage: 'Файлы отправлю сегодня', time: 'Вчера', unread: 0, avatar: 'ОИ', online: false },
-    { id: 5, name: 'Техподдержка', lastMessage: 'Ваш вопрос решён', time: '15 янв', unread: 0, avatar: 'ТП', online: true },
-  ];
+  const adminChat = { 
+    id: 999, 
+    name: 'Техподдержка', 
+    lastMessage: user.id === 2 ? 'У вас новые обращения' : 'Мы всегда на связи', 
+    time: '14:32', 
+    unread: user.id === 2 ? 2 : 0, 
+    avatar: '🛡️', 
+    online: true 
+  };
+
+  const chats: Chat[] = user.id === 2 
+    ? [
+        { id: 1, name: 'Пользователь #1234', lastMessage: 'Помогите с оплатой', time: '14:32', unread: 2, avatar: '👤', online: true },
+        { id: 2, name: 'Пользователь #5678', lastMessage: 'Спасибо за помощь!', time: '12:15', unread: 0, avatar: '👤', online: false },
+        { id: 3, name: 'Пользователь #9012', lastMessage: 'Не работает функция', time: 'Вчера', unread: 0, avatar: '👤', online: true },
+      ]
+    : [adminChat];
 
   const messages: Message[] = [
     { id: 1, text: 'Привет! Как дела с проектом?', time: '14:25', isMine: false },
@@ -67,12 +79,12 @@ const Index = () => {
   ];
 
   const navItems = [
-    { id: 'home', label: 'Главная', icon: 'Home' },
+    { id: 'home', label: 'Главная', icon: 'Home', action: () => navigate('/') },
     { id: 'chats', label: 'Чаты', icon: 'MessageCircle' },
+    { id: 'shop', label: 'Магазин', icon: 'ShoppingBag', action: () => navigate('/shop') },
     ...(user.id === 2 ? [{ id: 'admin', label: 'Админ-панель', icon: 'Shield' }] : []),
     { id: 'profile', label: 'Профиль', icon: 'User' },
     { id: 'settings', label: 'Настройки', icon: 'Settings' },
-    { id: 'support', label: 'Поддержка', icon: 'HelpCircle' },
   ];
 
   const totalUnread = chats.reduce((sum, chat) => sum + chat.unread, 0);
@@ -154,7 +166,13 @@ const Index = () => {
           {navItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveSection(item.id)}
+              onClick={() => {
+                if ('action' in item && item.action) {
+                  item.action();
+                } else {
+                  setActiveSection(item.id);
+                }
+              }}
               className={`relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 ${
                 activeSection === item.id
                   ? 'bg-primary text-primary-foreground shadow-lg'
@@ -185,7 +203,15 @@ const Index = () => {
           <div className={`${activeChat ? 'hidden md:flex' : 'flex'} w-full md:w-80 bg-card flex-col`}>
             <div className="p-4 md:p-6 border-b border-border">
               <div className="flex items-center justify-between mb-4">
-                <h1 className="text-2xl font-semibold">Чаты</h1>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => navigate('/')}
+                    className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted"
+                  >
+                    <Icon name="ChevronLeft" size={20} />
+                  </button>
+                  <h1 className="text-2xl font-semibold">Чаты</h1>
+                </div>
                 <button
                   onClick={() => setShowMobileNav(true)}
                   className="md:hidden w-10 h-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted"
