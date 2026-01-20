@@ -1,0 +1,20 @@
+{
+  "tests": [
+    {
+      "name": "Create admin account",
+      "method": "POST",
+      "path": "/",
+      "expectedStatus": 201,
+      "expectedBody": {
+        "message": "string",
+        "admin": {
+          "id": "number",
+          "email": "string",
+          "full_name": "string",
+          "avatar_initials": "string"
+        }
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
