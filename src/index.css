@@ -107,3 +107,35 @@
       sans-serif;
   }
 }
+
+@layer utilities {
+  .swipe-indicator {
+    position: relative;
+  }
+
+  .swipe-indicator::before,
+  .swipe-indicator::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: hsl(var(--primary) / 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  .swipe-indicator::before {
+    left: 20px;
+  }
+
+  .swipe-indicator::after {
+    right: 20px;
+  }
+}

@@ -32,6 +32,7 @@ const Index = () => {
   const [showMobileNav, setShowMobileNav] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState(0);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -84,11 +85,20 @@ const Index = () => {
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    const currentTouch = e.targetTouches[0].clientX;
+    setTouchEnd(currentTouch);
+    
+    if (touchStart) {
+      const diff = currentTouch - touchStart;
+      setSwipeOffset(diff);
+    }
   };
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    if (!touchStart || !touchEnd) {
+      setSwipeOffset(0);
+      return;
+    }
     
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
@@ -107,6 +117,10 @@ const Index = () => {
         setActiveChat(chats[currentIndex + 1].id);
       }
     }
+    
+    setSwipeOffset(0);
+    setTouchStart(null);
+    setTouchEnd(null);
   };
 
   return (
@@ -208,8 +222,12 @@ const Index = () => {
           <div className="hidden md:block w-px bg-border"></div>
 
           <div 
-            className={`${activeChat ? 'flex' : 'hidden md:flex'} flex-1 flex-col`}
+            className={`${activeChat ? 'flex' : 'hidden md:flex'} flex-1 flex-col transition-transform duration-200 md:transform-none`}
             ref={chatContainerRef}
+            style={{
+              transform: swipeOffset !== 0 ? `translateX(${Math.max(-100, Math.min(100, swipeOffset * 0.3))}px)` : 'translateX(0)',
+              transition: swipeOffset === 0 ? 'transform 0.2s ease-out' : 'none'
+            }}
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
@@ -248,7 +266,17 @@ const Index = () => {
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 relative">
+                  {swipeOffset > 30 && (
+                    <div className="md:hidden absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center z-10 animate-fade-in">
+                      <Icon name="ChevronLeft" size={24} className="text-primary" />
+                    </div>
+                  )}
+                  {swipeOffset < -30 && (
+                    <div className="md:hidden absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center z-10 animate-fade-in">
+                      <Icon name="ChevronRight" size={24} className="text-primary" />
+                    </div>
+                  )}
                   <div className="space-y-3 md:space-y-4 max-w-3xl mx-auto">
                     {messages.map((message) => (
                       <div
