@@ -2,9 +2,19 @@ import { Button } from "@/components/ui/button";
 import Icon from "@/components/ui/icon";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
 
 const Shop = () => {
   const navigate = useNavigate();
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      setUnreadMessages(user.id === 2 ? 2 : 0);
+    }
+  }, []);
 
   const products = [
     {
@@ -133,8 +143,13 @@ const Shop = () => {
           </button>
           <button 
             onClick={() => navigate('/chats')}
-            className="flex flex-col items-center gap-1 py-2 px-4 text-muted-foreground hover:text-foreground transition-colors"
+            className="relative flex flex-col items-center gap-1 py-2 px-4 text-muted-foreground hover:text-foreground transition-colors"
           >
+            {unreadMessages > 0 && (
+              <Badge className="absolute top-1 right-2 bg-red-500 text-white min-w-[18px] h-[18px] flex items-center justify-center text-[10px] px-1">
+                {unreadMessages}
+              </Badge>
+            )}
             <Icon name="MessageCircle" size={24} />
             <span className="text-xs">Чаты</span>
           </button>

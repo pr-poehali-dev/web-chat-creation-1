@@ -1,9 +1,20 @@
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import Icon from "@/components/ui/icon";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      setUnreadMessages(user.id === 2 ? 2 : 0);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -35,6 +46,11 @@ const Home = () => {
             onClick={() => navigate('/chats')}
             className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/90 to-primary p-6 md:p-8 text-white transition-transform hover:scale-105 active:scale-95"
           >
+            {unreadMessages > 0 && (
+              <Badge className="absolute top-3 right-3 z-20 bg-red-500 text-white min-w-[24px] h-6 flex items-center justify-center px-2 animate-pulse">
+                {unreadMessages}
+              </Badge>
+            )}
             <div className="relative z-10">
               <div className="w-12 h-12 md:w-14 md:h-14 mb-3 rounded-xl bg-white/20 flex items-center justify-center">
                 <Icon name="MessageCircle" size={24} className="md:w-7 md:h-7" />
@@ -70,8 +86,13 @@ const Home = () => {
           </button>
           <button 
             onClick={() => navigate('/chats')}
-            className="flex flex-col items-center gap-1 py-2 px-4 text-muted-foreground hover:text-foreground transition-colors"
+            className="relative flex flex-col items-center gap-1 py-2 px-4 text-muted-foreground hover:text-foreground transition-colors"
           >
+            {unreadMessages > 0 && (
+              <Badge className="absolute top-1 right-2 bg-red-500 text-white min-w-[18px] h-[18px] flex items-center justify-center text-[10px] px-1">
+                {unreadMessages}
+              </Badge>
+            )}
             <Icon name="MessageCircle" size={24} />
             <span className="text-xs">Чаты</span>
           </button>
