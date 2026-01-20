@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -30,6 +30,9 @@ const Index = () => {
   const [messageInput, setMessageInput] = useState('');
   const [showNotifications, setShowNotifications] = useState(true);
   const [showMobileNav, setShowMobileNav] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -72,6 +75,39 @@ const Index = () => {
   ];
 
   const totalUnread = chats.reduce((sum, chat) => sum + chat.unread, 0);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (activeChat && isRightSwipe) {
+      const currentIndex = chats.findIndex(c => c.id === activeChat);
+      if (currentIndex === 0) {
+        setActiveChat(null);
+      } else {
+        setActiveChat(chats[currentIndex - 1].id);
+      }
+    } else if (activeChat && isLeftSwipe) {
+      const currentIndex = chats.findIndex(c => c.id === activeChat);
+      if (currentIndex < chats.length - 1) {
+        setActiveChat(chats[currentIndex + 1].id);
+      }
+    }
+  };
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -171,7 +207,13 @@ const Index = () => {
 
           <div className="hidden md:block w-px bg-border"></div>
 
-          <div className={`${activeChat ? 'flex' : 'hidden md:flex'} flex-1 flex-col`}>
+          <div 
+            className={`${activeChat ? 'flex' : 'hidden md:flex'} flex-1 flex-col`}
+            ref={chatContainerRef}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
             {activeChat ? (
               <>
                 <div className="h-14 md:h-16 border-b border-border flex items-center justify-between px-4 md:px-6">
