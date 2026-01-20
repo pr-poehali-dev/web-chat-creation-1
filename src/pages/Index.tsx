@@ -323,6 +323,27 @@ const Index = () => {
                   </div>
                 </div>
 
+                <div className="md:hidden flex justify-center gap-1.5 py-2 bg-background/80 backdrop-blur-sm">
+                  {chats.map((chat, index) => (
+                    <button
+                      key={chat.id}
+                      onClick={() => {
+                        setActiveChat(chat.id);
+                        triggerHaptic('light');
+                      }}
+                      className="group"
+                    >
+                      <div 
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          activeChat === chat.id 
+                            ? 'w-6 bg-primary' 
+                            : 'w-1.5 bg-border group-hover:bg-muted-foreground'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+
                 <div className="p-3 md:p-4 border-t border-border">
                   <div className="flex items-end gap-2 max-w-3xl mx-auto">
                     <Button variant="ghost" size="icon" className="rounded-xl mb-1 hidden md:flex">
