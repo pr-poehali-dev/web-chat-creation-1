@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import Auth from './Auth';
 
 interface Chat {
   id: number;
@@ -22,10 +23,27 @@ interface Message {
 }
 
 const Index = () => {
+  const [user, setUser] = useState<any>(null);
   const [activeSection, setActiveSection] = useState('chats');
   const [activeChat, setActiveChat] = useState<number | null>(1);
   const [messageInput, setMessageInput] = useState('');
   const [showNotifications, setShowNotifications] = useState(true);
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
+  if (!user) {
+    return <Auth onAuthSuccess={setUser} />;
+  }
 
   const chats: Chat[] = [
     { id: 1, name: 'Анна Смирнова', lastMessage: 'Отлично, созвонимся завтра!', time: '14:32', unread: 3, avatar: 'АС', online: true },
@@ -80,8 +98,12 @@ const Index = () => {
           ))}
         </div>
 
-        <button className="w-12 h-12 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
-          <Icon name="MoreVertical" size={22} />
+        <button 
+          onClick={handleLogout}
+          className="w-12 h-12 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
+          title="Выход"
+        >
+          <Icon name="LogOut" size={22} />
         </button>
       </div>
 
@@ -238,9 +260,15 @@ const Index = () => {
       {activeSection === 'profile' && (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center max-w-md">
-            <Icon name="User" size={64} className="mx-auto mb-4 text-primary" />
-            <h2 className="text-2xl font-semibold mb-2">Профиль</h2>
-            <p className="text-muted-foreground">Управление вашим профилем</p>
+            <div className="w-24 h-24 rounded-full bg-primary/10 text-primary font-semibold text-3xl mx-auto mb-4 flex items-center justify-center">
+              {user.avatar_initials}
+            </div>
+            <h2 className="text-2xl font-semibold mb-2">{user.full_name}</h2>
+            <p className="text-muted-foreground mb-6">{user.email}</p>
+            <Button onClick={handleLogout} variant="outline" className="rounded-xl">
+              <Icon name="LogOut" size={18} className="mr-2" />
+              Выйти из аккаунта
+            </Button>
           </div>
         </div>
       )}
