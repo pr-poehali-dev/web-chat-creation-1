@@ -26,9 +26,10 @@ interface Message {
 const Index = () => {
   const [user, setUser] = useState<any>(null);
   const [activeSection, setActiveSection] = useState('chats');
-  const [activeChat, setActiveChat] = useState<number | null>(1);
+  const [activeChat, setActiveChat] = useState<number | null>(null);
   const [messageInput, setMessageInput] = useState('');
   const [showNotifications, setShowNotifications] = useState(true);
+  const [showMobileNav, setShowMobileNav] = useState(false);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -74,7 +75,7 @@ const Index = () => {
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
-      <div className="w-20 bg-card border-r border-border flex flex-col items-center py-6 gap-6">
+      <div className="hidden md:flex w-20 bg-card border-r border-border flex-col items-center py-6 gap-6">
         <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground font-semibold text-xl">
           C
         </div>
@@ -111,9 +112,17 @@ const Index = () => {
 
       {activeSection === 'chats' && (
         <>
-          <div className="w-80 bg-card flex flex-col">
-            <div className="p-6 border-b border-border">
-              <h1 className="text-2xl font-semibold mb-4">Чаты</h1>
+          <div className={`${activeChat ? 'hidden md:flex' : 'flex'} w-full md:w-80 bg-card flex-col`}>
+            <div className="p-4 md:p-6 border-b border-border">
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="text-2xl font-semibold">Чаты</h1>
+                <button
+                  onClick={() => setShowMobileNav(true)}
+                  className="md:hidden w-10 h-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted"
+                >
+                  <Icon name="Menu" size={22} />
+                </button>
+              </div>
               <div className="relative">
                 <Icon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                 <Input
@@ -128,7 +137,7 @@ const Index = () => {
                 <button
                   key={chat.id}
                   onClick={() => setActiveChat(chat.id)}
-                  className={`w-full p-4 flex items-start gap-3 transition-colors border-b border-border hover:bg-muted ${
+                  className={`w-full p-3 md:p-4 flex items-start gap-3 transition-colors border-b border-border hover:bg-muted ${
                     activeChat === chat.id ? 'bg-muted' : ''
                   }`}
                 >
@@ -160,13 +169,19 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="w-px bg-border"></div>
+          <div className="hidden md:block w-px bg-border"></div>
 
-          <div className="flex-1 flex flex-col">
+          <div className={`${activeChat ? 'flex' : 'hidden md:flex'} flex-1 flex-col`}>
             {activeChat ? (
               <>
-                <div className="h-16 border-b border-border flex items-center justify-between px-6">
-                  <div className="flex items-center gap-3">
+                <div className="h-14 md:h-16 border-b border-border flex items-center justify-between px-4 md:px-6">
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <button
+                      onClick={() => setActiveChat(null)}
+                      className="md:hidden w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted mr-1"
+                    >
+                      <Icon name="ChevronLeft" size={20} />
+                    </button>
                     <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-medium flex items-center justify-center">
                       {chats.find(c => c.id === activeChat)?.avatar}
                     </div>
@@ -178,11 +193,11 @@ const Index = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" className="rounded-xl">
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <Button variant="ghost" size="icon" className="rounded-xl hidden md:flex">
                       <Icon name="Phone" size={20} />
                     </Button>
-                    <Button variant="ghost" size="icon" className="rounded-xl">
+                    <Button variant="ghost" size="icon" className="rounded-xl hidden md:flex">
                       <Icon name="Video" size={20} />
                     </Button>
                     <Button variant="ghost" size="icon" className="rounded-xl">
@@ -191,15 +206,15 @@ const Index = () => {
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-6">
-                  <div className="space-y-4 max-w-3xl mx-auto">
+                <div className="flex-1 overflow-y-auto p-4 md:p-6">
+                  <div className="space-y-3 md:space-y-4 max-w-3xl mx-auto">
                     {messages.map((message) => (
                       <div
                         key={message.id}
                         className={`flex ${message.isMine ? 'justify-end' : 'justify-start'} animate-fade-in`}
                       >
                         <div
-                          className={`max-w-md px-4 py-3 rounded-2xl ${
+                          className={`max-w-[85%] md:max-w-md px-3 md:px-4 py-2 md:py-3 rounded-2xl ${
                             message.isMine
                               ? 'bg-primary text-primary-foreground rounded-br-md'
                               : 'bg-card border border-border rounded-bl-md'
@@ -215,9 +230,9 @@ const Index = () => {
                   </div>
                 </div>
 
-                <div className="p-4 border-t border-border">
+                <div className="p-3 md:p-4 border-t border-border">
                   <div className="flex items-end gap-2 max-w-3xl mx-auto">
-                    <Button variant="ghost" size="icon" className="rounded-xl mb-1">
+                    <Button variant="ghost" size="icon" className="rounded-xl mb-1 hidden md:flex">
                       <Icon name="Paperclip" size={20} />
                     </Button>
                     <div className="flex-1 relative">
@@ -225,14 +240,15 @@ const Index = () => {
                         value={messageInput}
                         onChange={(e) => setMessageInput(e.target.value)}
                         placeholder="Напишите сообщение..."
-                        className="pr-12 rounded-2xl bg-muted border-0 focus-visible:ring-1"
+                        className="pr-10 md:pr-12 rounded-2xl bg-muted border-0 focus-visible:ring-1 text-sm md:text-base"
                       />
-                      <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 rounded-xl">
+                      <Button variant="ghost" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2 rounded-xl hidden md:flex">
                         <Icon name="Smile" size={20} />
                       </Button>
                     </div>
-                    <Button className="rounded-2xl px-6">
-                      <Icon name="Send" size={18} />
+                    <Button className="rounded-2xl px-4 md:px-6">
+                      <Icon name="Send" size={16} className="md:hidden" />
+                      <Icon name="Send" size={18} className="hidden md:block" />
                     </Button>
                   </div>
                 </div>
@@ -299,8 +315,51 @@ const Index = () => {
         <AdminPanel adminId={user.id} onClose={() => setActiveSection('chats')} />
       )}
 
+      {showMobileNav && (
+        <div className="md:hidden fixed inset-0 bg-black/50 z-50" onClick={() => setShowMobileNav(false)}>
+          <div className="absolute bottom-0 left-0 right-0 bg-card rounded-t-3xl p-6 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+            <div className="w-12 h-1 bg-border rounded-full mx-auto mb-6"></div>
+            <div className="space-y-2">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveSection(item.id);
+                    setShowMobileNav(false);
+                    setActiveChat(null);
+                  }}
+                  className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-colors ${
+                    activeSection === item.id
+                      ? 'bg-primary text-primary-foreground'
+                      : 'hover:bg-muted'
+                  }`}
+                >
+                  <Icon name={item.icon as any} size={22} />
+                  <span className="font-medium">{item.label}</span>
+                  {item.id === 'chats' && totalUnread > 0 && (
+                    <Badge className="ml-auto bg-destructive text-white">
+                      {totalUnread}
+                    </Badge>
+                  )}
+                </button>
+              ))}
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setShowMobileNav(false);
+                }}
+                className="w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-muted text-destructive"
+              >
+                <Icon name="LogOut" size={22} />
+                <span className="font-medium">Выход</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showNotifications && totalUnread > 0 && (
-        <div className="fixed top-4 right-4 bg-card border border-border rounded-2xl shadow-2xl p-4 max-w-sm animate-fade-in">
+        <div className="fixed top-4 right-4 left-4 md:left-auto bg-card border border-border rounded-2xl shadow-2xl p-4 max-w-sm md:mx-0 mx-auto animate-fade-in">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
               <Icon name="Bell" size={20} className="text-primary" />
