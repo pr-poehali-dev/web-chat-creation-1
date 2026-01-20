@@ -94,6 +94,17 @@ const Index = () => {
     }
   };
 
+  const triggerHaptic = (style: 'light' | 'medium' | 'heavy' = 'medium') => {
+    if ('vibrate' in navigator) {
+      const patterns = {
+        light: [10],
+        medium: [20],
+        heavy: [30]
+      };
+      navigator.vibrate(patterns[style]);
+    }
+  };
+
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) {
       setSwipeOffset(0);
@@ -104,18 +115,27 @@ const Index = () => {
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
     
+    let didNavigate = false;
+    
     if (activeChat && isRightSwipe) {
       const currentIndex = chats.findIndex(c => c.id === activeChat);
       if (currentIndex === 0) {
         setActiveChat(null);
+        didNavigate = true;
       } else {
         setActiveChat(chats[currentIndex - 1].id);
+        didNavigate = true;
       }
     } else if (activeChat && isLeftSwipe) {
       const currentIndex = chats.findIndex(c => c.id === activeChat);
       if (currentIndex < chats.length - 1) {
         setActiveChat(chats[currentIndex + 1].id);
+        didNavigate = true;
       }
+    }
+    
+    if (didNavigate) {
+      triggerHaptic('medium');
     }
     
     setSwipeOffset(0);
@@ -186,7 +206,10 @@ const Index = () => {
               {chats.map((chat) => (
                 <button
                   key={chat.id}
-                  onClick={() => setActiveChat(chat.id)}
+                  onClick={() => {
+                    setActiveChat(chat.id);
+                    triggerHaptic('light');
+                  }}
                   className={`w-full p-3 md:p-4 flex items-start gap-3 transition-colors border-b border-border hover:bg-muted ${
                     activeChat === chat.id ? 'bg-muted' : ''
                   }`}
