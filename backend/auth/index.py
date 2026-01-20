@@ -102,7 +102,7 @@ def handler(event: dict, context) -> dict:
                 password_hash = hashlib.sha256(password.encode()).hexdigest()
                 
                 cur.execute(
-                    "SELECT id, email, full_name, avatar_initials FROM users WHERE email = %s AND password_hash = %s",
+                    "SELECT id, email, full_name, avatar_initials, is_blocked FROM users WHERE email = %s AND password_hash = %s",
                     (email, password_hash)
                 )
                 user = cur.fetchone()
@@ -112,6 +112,14 @@ def handler(event: dict, context) -> dict:
                         'statusCode': 401,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                         'body': json.dumps({'error': 'Неверный email или пароль'}),
+                        'isBase64Encoded': False
+                    }
+                
+                if user.get('is_blocked'):
+                    return {
+                        'statusCode': 403,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Ваш аккаунт заблокирован администратором'}),
                         'isBase64Encoded': False
                     }
                 

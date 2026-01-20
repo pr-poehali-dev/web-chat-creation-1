@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import Auth from './Auth';
+import AdminPanel from './AdminPanel';
 
 interface Chat {
   id: number;
@@ -63,6 +64,7 @@ const Index = () => {
   const navItems = [
     { id: 'home', label: 'Главная', icon: 'Home' },
     { id: 'chats', label: 'Чаты', icon: 'MessageCircle' },
+    ...(user.id === 2 ? [{ id: 'admin', label: 'Админ-панель', icon: 'Shield' }] : []),
     { id: 'profile', label: 'Профиль', icon: 'User' },
     { id: 'settings', label: 'Настройки', icon: 'Settings' },
     { id: 'support', label: 'Поддержка', icon: 'HelpCircle' },
@@ -291,6 +293,10 @@ const Index = () => {
             <p className="text-muted-foreground">Мы всегда готовы помочь</p>
           </div>
         </div>
+      )}
+
+      {activeSection === 'admin' && user.id === 2 && (
+        <AdminPanel adminId={user.id} onClose={() => setActiveSection('chats')} />
       )}
 
       {showNotifications && totalUnread > 0 && (

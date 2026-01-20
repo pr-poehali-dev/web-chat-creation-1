@@ -1,0 +1,34 @@
+{
+  "tests": [
+    {
+      "name": "Get users list as admin",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-Admin-Id": "2"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "users": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Block user",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-Admin-Id": "2"
+      },
+      "body": {
+        "action": "block",
+        "user_id": 1
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
