@@ -87,7 +87,7 @@ const Index = () => {
 
       {activeSection === 'chats' && (
         <>
-          <div className="w-80 bg-card border-r border-border flex flex-col">
+          <div className="w-80 bg-card flex flex-col">
             <div className="p-6 border-b border-border">
               <h1 className="text-2xl font-semibold mb-4">Чаты</h1>
               <div className="relative">
@@ -135,6 +135,8 @@ const Index = () => {
               ))}
             </div>
           </div>
+
+          <div className="w-px bg-border"></div>
 
           <div className="flex-1 flex flex-col">
             {activeChat ? (
