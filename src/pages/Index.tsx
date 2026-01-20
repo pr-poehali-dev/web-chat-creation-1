@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import Icon from '@/components/ui/icon';
 
 interface Chat {
@@ -101,7 +99,7 @@ const Index = () => {
               </div>
             </div>
 
-            <ScrollArea className="flex-1">
+            <div className="flex-1 overflow-y-auto">
               {chats.map((chat) => (
                 <button
                   key={chat.id}
@@ -111,11 +109,9 @@ const Index = () => {
                   }`}
                 >
                   <div className="relative">
-                    <Avatar className="w-12 h-12">
-                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                        {chat.avatar}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="w-12 h-12 rounded-full bg-primary/10 text-primary font-medium flex items-center justify-center">
+                      {chat.avatar}
+                    </div>
                     {chat.online && (
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card" />
                     )}
@@ -137,7 +133,7 @@ const Index = () => {
                   </div>
                 </button>
               ))}
-            </ScrollArea>
+            </div>
           </div>
 
           <div className="flex-1 flex flex-col">
@@ -145,11 +141,9 @@ const Index = () => {
               <>
                 <div className="h-16 border-b border-border flex items-center justify-between px-6">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                        {chats.find(c => c.id === activeChat)?.avatar}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-medium flex items-center justify-center">
+                      {chats.find(c => c.id === activeChat)?.avatar}
+                    </div>
                     <div>
                       <h2 className="font-semibold text-sm">{chats.find(c => c.id === activeChat)?.name}</h2>
                       <p className="text-xs text-muted-foreground">
@@ -171,7 +165,7 @@ const Index = () => {
                   </div>
                 </div>
 
-                <ScrollArea className="flex-1 p-6">
+                <div className="flex-1 overflow-y-auto p-6">
                   <div className="space-y-4 max-w-3xl mx-auto">
                     {messages.map((message) => (
                       <div
@@ -193,7 +187,7 @@ const Index = () => {
                       </div>
                     ))}
                   </div>
-                </ScrollArea>
+                </div>
 
                 <div className="p-4 border-t border-border">
                   <div className="flex items-end gap-2 max-w-3xl mx-auto">
